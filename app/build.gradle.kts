@@ -39,7 +39,7 @@ android {
         }
 
         configureEach {
-            resValue("string","app_name","MobileGlues")
+            resValue("string","app_name","MobileGL")
 
             manifestPlaceholders["des"] = "MobileGL (OpenGL 4.0, 1.17+)"
             manifestPlaceholders["renderer"] = "MobileGlues:libMobileGL.so:libMobileGL.so"
