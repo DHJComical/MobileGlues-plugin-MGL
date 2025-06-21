@@ -29,6 +29,13 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+#      - name: Set Up Android NDK
+#        uses: nttld/setup-ndk@v1
+#        with:
+#          ndk-version: r27c
+#          local-cache: true
+#          link-to-sdk: true
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -42,10 +49,6 @@ jobs:
 
       - name: Build apk
         run: ./gradlew assembleRelease
-        env:
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
 
       - name: Upload apk
         uses: actions/upload-artifact@v4
