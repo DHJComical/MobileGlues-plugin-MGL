@@ -10,7 +10,7 @@ android {
     ndkVersion = "27.1.12297006"
 
     defaultConfig {
-        applicationId = "com.fcl.plugin.mobileglues"
+        applicationId = "com.fcl.plugin.mobilegl"
         minSdk = 26
         targetSdk = 35
         versionCode = 1250
