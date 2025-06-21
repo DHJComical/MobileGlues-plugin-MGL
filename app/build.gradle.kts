@@ -41,8 +41,8 @@ android {
         configureEach {
             resValue("string","app_name","MobileGlues")
 
-            manifestPlaceholders["des"] = "MobileGlues (OpenGL 4.0, 1.17+)"
-            manifestPlaceholders["renderer"] = "MobileGlues:libmobileglues.so:libEGL.so"
+            manifestPlaceholders["des"] = "MobileGL (OpenGL 4.0, 1.17+)"
+            manifestPlaceholders["renderer"] = "MobileGlues:libMobileGL.so:libMobileGL.so"
 
             manifestPlaceholders["minMCVer"] = "1.17"
             manifestPlaceholders["maxMCVer"] = "" //为空则不限制 No restriction if empty
