@@ -1,4 +1,0 @@
-[submodule "MobileGlues"]
-	path = MobileGlues
-	url = https://github.com/DHJComical/MobileGL
-	branch = Feat/Backend-Direct-GLES
