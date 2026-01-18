@@ -16,6 +16,15 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Update glslang sources (Explicit Path)
+        working-directory: MobileGlues\3rdparty\glslang
+        run: python3 update_glslang_sources.py
+
       - name: Set current date as env variable
         run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
@@ -28,13 +37,6 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
-
-#      - name: Set Up Android NDK
-#        uses: nttld/setup-ndk@v1
-#        with:
-#          ndk-version: r27c
-#          local-cache: true
-#          link-to-sdk: true
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
