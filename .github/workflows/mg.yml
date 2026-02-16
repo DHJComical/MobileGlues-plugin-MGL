@@ -53,8 +53,8 @@ jobs:
 
       - name: Strip debug symbols
         run: |
-          STRIP_TOOL="$ANDROID_HOME/ndk/27.3.13750724/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip"
-          find app/build/intermediates/merged_native_libs/release/out/lib/ -name "*.so" -exec $STRIP_TOOL --strip-unneeded {} +
+          STRIP_TOOL=$(find $ANDROID_HOME/ndk/27.3.13750724 -name llvm-strip | head -n 1)
+          echo "Using strip tool: $STRIP_TOOL"
           
       - name: Upload apk
         uses: actions/upload-artifact@v4
