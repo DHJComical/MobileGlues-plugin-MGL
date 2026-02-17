@@ -20,15 +20,12 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Update glslang sources (Explicit Path)
+      - name: Update glslang sources
         working-directory: MobileGlues/3rdparty/glslang
         run: python3 update_glslang_sources.py
 
       - name: Set current date as env variable
         run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: Set repository name as env variable
-        run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
 
       - name: Set Up JDK
         uses: actions/setup-java@v4
@@ -42,8 +39,16 @@ jobs:
 
       - name: Install Android NDK
         run: |
-          echo "y" | sdkmanager "ndk;27.3.13750724"
-          echo "ndk.dir=$ANDROID_HOME/ndk/27.3.13750724" >> local.properties
+          echo "y" | sdkmanager "ndk;27.3.13750724" || echo "y" | sdkmanager --channel=3 "ndk;27.3.13750724"
+          
+          NDK_ROOT="$ANDROID_HOME/ndk/27.3.13750724"
+          if [ ! -d "$NDK_ROOT" ]; then
+            echo "错误: 无法安装或找不到 NDK 27.3.13750724 在 $NDK_ROOT"
+            exit 1
+          fi
+          
+          echo "NDK_PATH=$NDK_ROOT" >> $GITHUB_ENV
+          echo "ndk.dir=$NDK_ROOT" >> local.properties
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
@@ -53,11 +58,32 @@ jobs:
 
       - name: Strip debug symbols
         run: |
-          STRIP_TOOL=$(find $ANDROID_HOME/ndk/27.3.13750724 -name llvm-strip | head -n 1)
-          echo "Using strip tool: $STRIP_TOOL"
+          STRIP_TOOL="${{ env.NDK_PATH }}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip"
           
-      - name: Upload apk
+          if [ ! -f "$STRIP_TOOL" ]; then
+            echo "寻找 llvm-strip..."
+            STRIP_TOOL=$(find ${{ env.NDK_PATH }} -name llvm-strip | head -n 1)
+          fi
+          
+          echo "使用 Strip 工具: $STRIP_TOOL"
+          $STRIP_TOOL --version
+
+          echo "正在搜索并裁剪 .so 文件..."
+          find app/build -name "*.so" -type f -exec echo "Stripping: {}" \; -exec $STRIP_TOOL --strip-unneeded {} +
+
+          mkdir -p stripped_libs
+          find app/build/outputs/apk/release/ -name "*.apk" -exec cp {} . \;
+          
+          find app/build -name "*.so" -type f | while read -r so_file; do
+            arch=$(basename $(dirname "$so_file"))
+            mkdir -p "stripped_libs/$arch"
+            cp "$so_file" "stripped_libs/$arch/"
+          done
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: MobileGL_${{ env.date_today }}_${{ github.sha }}
-          path: app/build/outputs/apk/release/
+          path: |
+            app/build/outputs/apk/release/
+            stripped_libs/
